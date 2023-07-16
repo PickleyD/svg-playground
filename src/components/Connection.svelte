@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { cn } from '$lib/utils';
+
 	type Vector2 = [x: number, y: number];
 
 	const dist = ([x1, y1]: Vector2, [x2, y2]: Vector2) => {
@@ -59,8 +61,8 @@
 	export let radius1 = 30;
 	export let radius2 = 30;
 	export let center1: Vector2;
-	export let center2: Vector2;	
-    export let fill = '#000';
+	export let center2: Vector2;
+	export let fill = '#000';
 	export let stroke = '#faa';
 	const d = dist(center1, center2);
 	const maxSpread = Math.acos((radius1 - radius2) / d);
@@ -102,6 +104,9 @@
 	const h4 = getVector(p4, angle4 - HALF_PI, r2);
 
 	const path = metaballToPath(p1, p2, p3, p4, h1, h2, h3, h4, d > radius1, radius1, radius2);
+
+	let className: string | undefined | null = undefined;
+	export { className as class };
 </script>
 
-<path d={path} {fill} {stroke}/>
+<path d={path} {fill} {stroke} class={cn('', className)} />
