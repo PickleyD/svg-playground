@@ -18,55 +18,120 @@
 
 	let centers: Array<Vector2> = [];
 	for (let i = 0; i < numCirclesY; i++) {
-		let y = 230 + i * 80;
+		let y = 230 + i * 90;
 		for (let j = 0; j < numCirclesX; j++) {
-			centers.push([230 + j * 80, y]);
+			centers.push([230 + j * 90, y]);
 		}
 	}
 
 	const fill = '#000';
 	const stroke = '#000';
 
-	// let triggered = false;
-	// const handleTrigger = () => {
-	// 	console.log('trigger');
-	// 	triggered = !triggered;
-	// };
+	let triggered = false;
+	const handleTrigger = () => {
+		triggered = !triggered;
+		rows = [
+			[
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random())
+			],
+			[
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random())
+			],
+			[
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random())
+			],
+			[
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random())
+			],
+			[
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random()),
+				Math.round(Math.random())
+			]
+		];
+	};
+
+	let rows = [
+		[
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random())
+		],
+		[
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random())
+		],
+		[
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random())
+		],
+		[
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random())
+		],
+		[
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random()),
+			Math.round(Math.random())
+		]
+	];
 </script>
 
-<svg class="fixed top-0 left-0 h-full w-full" viewBox="0 0 1000 1000">
+<svg id="scroll-container" class="fixed top-0 left-0 h-full w-full" viewBox="0 0 1000 1000">
 	<rect width="100%" height="100%" fill="#fff" />
 	<g stroke-width="0">
 		{#each centers as center, i}
 			<circle id={`circle-${i}`} cx={center[0]} cy={center[1]} r={radius} {fill} {stroke} />
 		{/each}
 
-		<Connection center1={centers[0]} center2={centers[1]} fill="green" stroke="red" class="opacity-50" />
-		<Connection center1={centers[7]} center2={centers[14]} fill="black" stroke="black" class="" />
-		<Connection center1={centers[14]} center2={centers[19]} fill="black" stroke="black" class="" />
-		<Connection center1={centers[6]} center2={centers[13]} fill="black" stroke="black" class="" />
-		<Connection center1={centers[12]} center2={centers[19]} fill="black" stroke="black" class="" />
-
-		<Connection center1={centers[15]} center2={centers[16]} fill="black" stroke="black" />
-
-		<!-- {#if triggered}
-			<Connection
-				center1={centers[21]}
-				center2={centers[28]}
-				fill="black"
-				stroke="black"
-				class=""
-			/>
-		{:else}
-			<Connection
-				center1={centers[14]}
-				center2={centers[21]}
-				fill="black"
-				stroke="black"
-				class=""
-			/>
-		{/if} -->
+		{#each rows as row, i}
+			{#each row as square, j}
+				<Connection
+					center1={centers[(i * 6) + j]}
+					center2={centers[(i * 6) + j + 7]}
+					show={Boolean(square)}
+					arcRadius={2 * radius}
+				/>
+				<Connection
+					center1={centers[(i * 6) + j + 1]}
+					center2={centers[(i * 6) + j + 6]}
+					show={!Boolean(square)}
+					arcRadius={2 * radius}
+				/>
+			{/each}
+		{/each}
 	</g>
 </svg>
 
-<!-- <button class="fixed" on:click={handleTrigger}>trigger</button> -->
+<button class="fixed" on:click={handleTrigger}>trigger</button>

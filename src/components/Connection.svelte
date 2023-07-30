@@ -18,53 +18,15 @@
 		return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
 	};
 
-	const metaballToPath = (
-		p1: Vector2,
-		p2: Vector2,
-		p3: Vector2,
-		p4: Vector2,
-		h1: Vector2,
-		h2: Vector2,
-		h3: Vector2,
-		h4: Vector2,
-		escaped: boolean,
-		r1: number,
-		r2: number
-	) => {
-		return [
-			'M',
-			p1,
-			'C',
-			h1,
-			h3,
-			p3,
-			'A',
-			r2,
-			r2,
-			0,
-			escaped ? 1 : 0,
-			0,
-			p4,
-			'C',
-			h4,
-			h2,
-			p2,
-			'A',
-			r1,
-			r1,
-			0,
-			escaped ? 1 : 0,
-			0,
-			p1
-		].join(' ');
-	};
-
 	let v = 0.5;
+	const duration = 0.4;
+	export let show: boolean = false;
 	export let handleSize = 2.5;
 	export let radius1 = 30;
 	export let radius2 = 30;
 	export let center1: Vector2;
 	export let center2: Vector2;
+    export let arcRadius: number;
 	export let fill = '#000';
 	export let stroke = '#faa';
 	const d = dist(center1, center2);
@@ -99,19 +61,24 @@
 	let r1 = radius1 * d2;
 	let r2 = radius2 * d2;
 
+    // Use max handle length that gives circular arcs
+    // https://stackoverflow.com/a/27863181
+    let maxHandleLength = 0.552284749831 * arcRadius
+
 	const HALF_PI = Math.PI / 2;
 
-	let h1 = getVector(p1, angle1 - HALF_PI, r1);
-	let h2 = getVector(p2, angle2 + HALF_PI, r1);
-	let h3 = getVector(p3, angle3 + HALF_PI, r2);
-	let h4 = getVector(p4, angle4 - HALF_PI, r2);
-
-	let path = metaballToPath(p1, p2, p3, p4, h1, h2, h3, h4, d > radius1, radius1, radius2);
+	// let h1 = getVector(p1, angle1 - HALF_PI, r1);
+	// let h2 = getVector(p2, angle2 + HALF_PI, r1);
+	// let h3 = getVector(p3, angle3 + HALF_PI, r2);
+	// let h4 = getVector(p4, angle4 - HALF_PI, r2);
+    let h1 = getVector(p1, angle1 - HALF_PI, maxHandleLength);
+	let h2 = getVector(p2, angle2 + HALF_PI, maxHandleLength);
+	let h3 = getVector(p3, angle3 + HALF_PI, maxHandleLength);
+	let h4 = getVector(p4, angle4 - HALF_PI, maxHandleLength);
 
 	let className: string | undefined | null = undefined;
 	export { className as class };
 
-	//
 	let v2 = 0;
 	const shrinkAngle1 = angleBetweenCenters + u1 + (maxSpread - u1) * v2;
 	const shrinkAngle2 = angleBetweenCenters - (u1 + (maxSpread - u1) * v2);
@@ -135,125 +102,86 @@
 	const shrinkH3 = getVector(shrinkP3, shrinkAngle3 + HALF_PI, shrinkR2);
 	const shrinkH4 = getVector(shrinkP4, shrinkAngle4 - HALF_PI, shrinkR2);
 
-	const path2 = metaballToPath(
-		shrinkP1,
-		shrinkP2,
-		shrinkP3,
-		shrinkP4,
-		shrinkH1,
-		shrinkH2,
-		shrinkH3,
-		shrinkH4,
-		d > radius1,
-		radius1,
-		radius2
-	);
-	let demo = p1;
-	let demoAnim: Vector2 = [0, 0];
-	let pxArrAnim: Array<number> = [];
-	let pyArrAnim: Array<number> = [];
+	let hxArr = [shrinkH1[0], shrinkH2[0], shrinkH3[0], shrinkH4[0]];
+	let hyArr = [shrinkH1[1], shrinkH2[1], shrinkH3[1], shrinkH4[1]];
 	let hxArrAnim: Array<number> = [];
 	let hyArrAnim: Array<number> = [];
 
-	let arc1 = ['M', p1, 'A', r1, r1, 0, 0, 0, shrinkP1].join(' ');
-	let arc2 = ['M', p2, 'A', r1, r1, 0, 0, 1, shrinkP2].join(' ');
-	let arc3 = ['M', p3, 'A', r2, r2, 0, 0, 1, shrinkP3].join(' ');
-	let arc4 = ['M', p4, 'A', r2, r2, 0, 0, 0, shrinkP4].join(' ');
+	let arc1 = ['M', p1, 'A', radius1, radius1, 0, 0, 0, shrinkP1].join(' ');
+	let arc2 = ['M', p2, 'A', radius1, radius1, 0, 0, 1, shrinkP2].join(' ');
+	let arc3 = ['M', p3, 'A', radius2, radius2, 0, 0, 1, shrinkP3].join(' ');
+	let arc4 = ['M', p4, 'A', radius2, radius2, 0, 0, 0, shrinkP4].join(' ');
 
-    let p1Anim = p1
-    let p2Anim = p2
-    let p3Anim = p3
-    let p4Anim = p4
+	let p1Anim = p1;
+	let p2Anim = p2;
+	let p3Anim = p3;
+	let p4Anim = p4;
+
+	gsap.registerPlugin(MotionPathPlugin);
+	let tl = gsap.timeline({
+        // paused: true
+	});
 
 	onMount(() => {
-		gsap.registerPlugin(MotionPathPlugin);
-		let tl = gsap.timeline({
-			repeat: -1
-		});
-
-		// tl.to('#test-1', {
-		// 	duration: '5',
-		// 	motionPath: {
-		// 		path: arc1
-		// 	}
-		// });
-
-        tl.to(p1, {
-			duration: 4,
-			motionPath: {
-				path: arc1
-			},
-            ease: 'none',
-            onUpdate: (() => {
-                // @ts-ignore
-                p1Anim = [p1.x, p1.y]
-            })
-		}, 0);
-
-        tl.to(p2, {
-			duration: 4,
-			motionPath: {
-				path: arc2
-			},
-            ease: 'none',
-            onUpdate: (() => {
-                // @ts-ignore
-                p2Anim = [p2.x, p2.y]
-            })
-		}, 0);
-
-        tl.to(p3, {
-			duration: 4,
-			motionPath: {
-				path: arc3
-			},
-            ease: 'none',
-            onUpdate: (() => {
-                // @ts-ignore
-                p3Anim = [p3.x, p3.y]
-            })
-		}, 0);
-
-        tl.to(p4, {
-			duration: 4,
-			motionPath: {
-				path: arc4
-			},
-            ease: 'none',
-            onUpdate: (() => {
-                // @ts-ignore
-                p4Anim = [p4.x, p4.y]
-            })
-		}, 0);
-
-		let pxArr = [p1[0], p2[0], p3[0], p4[0], h1[0], h2[0], h3[0], h4[0]];
-		let hxArr = [h1[0], h2[0], h3[0], h4[0]];
-		tl.to(
-			pxArr,
+		tl.from(
+			p1,
 			{
-				endArray: [
-					shrinkP1[0],
-					shrinkP2[0],
-					shrinkP3[0],
-					shrinkP4[0],
-					shrinkH1[0],
-					shrinkH2[0],
-					shrinkH3[0],
-					shrinkH4[0]
-				],
-				duration: 4,
-				ease: 'sine.out',
+				duration,
+				motionPath: {
+					path: arc1
+				},
+				ease: 'none',
 				onUpdate: () => {
-					pxArrAnim = pxArr;
-					// let d2 = Math.min(v * handleSize, dist([pxArr[0], pyArr[0]], [pxArr[2], pyArr[2]]) / totalRadius);
-					// // Handle lengths
-					// let r1 = radius1 * d2;
-					// let r2 = radius2 * d2;
+					// @ts-ignore
+					p1Anim = [p1.x, p1.y];
+				}
+			},
+			0
+		);
 
-					// let h1 = getVector(p1, angle1 - HALF_PI, r1);
-					// let h2 = getVector(p2, angle2 + HALF_PI, r1);
-					// let h3 = getVector(p3, angle3 + HALF_PI, r2);
-					// let h4 = getVector(p4, angle4 - HALF_PI, r2);
+		tl.from(
+			p2,
+			{
+				duration,
+				motionPath: {
+					path: arc2
+				},
+				ease: 'none',
+				onUpdate: () => {
+					// @ts-ignore
+					p2Anim = [p2.x, p2.y];
+				}
+			},
+			0
+		);
+
+		tl.from(
+			p3,
+			{
+				duration,
+				motionPath: {
+					path: arc3
+				},
+				ease: 'none',
+				onUpdate: () => {
+					// @ts-ignore
+					p3Anim = [p3.x, p3.y];
+				}
+			},
+			0
+		);
+
+		tl.from(
+			p4,
+			{
+				duration,
+				motionPath: {
+					path: arc4
+				},
+				ease: 'none',
+				onUpdate: () => {
+					// @ts-ignore
+					p4Anim = [p4.x, p4.y];
 				}
 			},
 			0
@@ -262,53 +190,21 @@
 		tl.to(
 			hxArr,
 			{
-				endArray: [shrinkH1[0], shrinkH2[0], shrinkH3[0], shrinkH4[0]],
-				duration: 4,
+				endArray: [h1[0], h2[0], h3[0], h4[0]],
+				duration,
 				ease: 'linear',
 				onUpdate: () => {
 					hxArrAnim = hxArr;
-					// let d2 = Math.min(v * handleSize, dist([pxArr[0], pyArr[0]], [pxArr[2], pyArr[2]]) / totalRadius);
-					// // Handle lengths
-					// let r1 = radius1 * d2;
-					// let r2 = radius2 * d2;
-
-					// let h1 = getVector(p1, angle1 - HALF_PI, r1);
-					// let h2 = getVector(p2, angle2 + HALF_PI, r1);
-					// let h3 = getVector(p3, angle3 + HALF_PI, r2);
-					// let h4 = getVector(p4, angle4 - HALF_PI, r2);
 				}
 			},
 			0
 		);
 
-		let pyArr = [p1[1], p2[1], p3[1], p4[1], h1[1], h2[1], h3[1], h4[1]];
-		let hyArr = [h1[1], h2[1], h3[1], h4[1]];
-		tl.to(
-			pyArr,
-			{
-				endArray: [
-					shrinkP1[1],
-					shrinkP2[1],
-					shrinkP3[1],
-					shrinkP3[1],
-					shrinkH1[1],
-					shrinkH2[1],
-					shrinkH3[1],
-					shrinkH4[1]
-				],
-				duration: 4,
-				ease: 'sine.in',
-				onUpdate: () => {
-					pyArrAnim = pyArr;
-				}
-			},
-			0
-		);
 		tl.to(
 			hyArr,
 			{
-				endArray: [shrinkH1[1], shrinkH2[1], shrinkH3[1], shrinkH4[1]],
-				duration: 4,
+				endArray: [h1[1], h2[1], h3[1], h4[1]],
+				duration,
 				ease: 'linear',
 				onUpdate: () => {
 					hyArrAnim = hyArr;
@@ -317,15 +213,21 @@
 			0
 		);
 
-		// gsap.to(opts, {
-		//     duration: 4,
-		// 	v: 0.4,
-		//     ease: 'none',
-		// 	onUpdate: function () {
-		// 		v = parseFloat(opts.v.toFixed(1))
-		// 	}
-		// });
+        tl.fromTo(
+            path,
+            { opacity: 0, duration },
+            { opacity: 1 },
+            0
+        )
 	});
+
+    let hasShown = false
+	$: if (show) {
+        tl.reverse(0)
+        hasShown = true
+	} else if (hasShown === true) {
+        tl.play()
+    }
 
 	$: escaped = d > radius1;
 
@@ -333,10 +235,6 @@
 		'M',
 		p1Anim,
 		'C',
-		// pxArrAnim[4],
-		// pyArrAnim[4],
-		// pxArrAnim[6],
-		// pyArrAnim[6],
 		hxArrAnim[0],
 		hyArrAnim[0],
 		hxArrAnim[2],
@@ -350,10 +248,6 @@
 		0,
 		p4Anim,
 		'C',
-		// pxArrAnim[7],
-		// pyArrAnim[7],
-		// pxArrAnim[5],
-		// pyArrAnim[5],
 		hxArrAnim[3],
 		hyArrAnim[3],
 		hxArrAnim[1],
@@ -365,19 +259,23 @@
 		0,
 		escaped ? 1 : 0,
 		0,
-		p1Anim
+		p1Anim,
+		'z'
 	].join(' ');
+
+    let path: SVGPathElement;
 </script>
 
-<!-- <path d={arc1} fill="orange" stroke-width="8" stroke="orange" />
-<path d={arc2} fill="purple" stroke-width="8" stroke="purple" />
-<path d={arc3} fill="green" stroke-width="8" stroke="green" />
-<path d={arc4} fill="red" stroke-width="8" stroke="red" /> -->
+<path bind:this={path} d={newPath} {fill} {stroke} class={cn('', className)} />
+<!-- <path d={arc1} fill="orange" stroke-width="1" stroke="orange" />
+<path d={arc2} fill="purple" stroke-width="1" stroke="purple" />
+<path d={arc3} fill="green" stroke-width="1" stroke="green" />
+<path d={arc4} fill="red" stroke-width="1" stroke="red" />
 
 <circle cx={p1Anim[0]} cy={p1Anim[1]} r={1} fill="cyan" stroke="cyan" />
 <circle cx={p2Anim[0]} cy={p2Anim[1]} r={1} fill="cyan" stroke="cyan" />
 <circle cx={p3Anim[0]} cy={p3Anim[1]} r={1} fill="cyan" stroke="cyan" />
-<circle cx={p4Anim[0]} cy={p4Anim[1]} r={1} fill="cyan" stroke="cyan" />
+<circle cx={p4Anim[0]} cy={p4Anim[1]} r={1} fill="cyan" stroke="cyan" /> -->
 
 <!-- <circle cx={h1[0]} cy={h1[1]} r={1} fill="blue" stroke="blue" /> -->
 <!-- <circle cx={shrinkH1[0]} cy={shrinkH1[1]} r={1} fill='blue' stroke='blue' /> -->
