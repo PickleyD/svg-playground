@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import Connection from '../components/Connection.svelte';
+	import { throttle } from 'lodash';
 
 	type Vector2 = [x: number, y: number];
 
@@ -27,9 +29,16 @@
 	const fill = '#000';
 	const stroke = '#000';
 
-	let triggered = false;
+	onMount(() => {
+		const onScroll = throttle(handleTrigger, 1500, { leading: true, trailing: false });
+		window.addEventListener('wheel', onScroll);
+
+		return () => {
+			window.removeEventListener('wheel', onScroll);
+		};
+	});
+
 	const handleTrigger = () => {
-		triggered = !triggered;
 		rows = [
 			[
 				Math.round(Math.random()),
@@ -118,14 +127,14 @@
 		{#each rows as row, i}
 			{#each row as square, j}
 				<Connection
-					center1={centers[(i * 6) + j]}
-					center2={centers[(i * 6) + j + 7]}
+					center1={centers[i * 6 + j]}
+					center2={centers[i * 6 + j + 7]}
 					show={Boolean(square)}
 					arcRadius={2 * radius}
 				/>
 				<Connection
-					center1={centers[(i * 6) + j + 1]}
-					center2={centers[(i * 6) + j + 6]}
+					center1={centers[i * 6 + j + 1]}
+					center2={centers[i * 6 + j + 6]}
 					show={!Boolean(square)}
 					arcRadius={2 * radius}
 				/>
@@ -133,5 +142,3 @@
 		{/each}
 	</g>
 </svg>
-
-<button class="fixed" on:click={handleTrigger}>trigger</button>
