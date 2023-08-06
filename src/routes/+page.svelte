@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Connection from '../components/Connection.svelte';
+	import Triangle from '../components/Triangle.svelte';
 	import { throttle } from 'lodash';
 
 	type Vector2 = [x: number, y: number];
@@ -26,8 +27,21 @@
 		}
 	}
 
-	const fill = '#000';
-	const stroke = '#000';
+	const fill = '#050505';
+	const stroke = '#050505';
+
+	const COLORS = [
+		'#fb8304',
+		'#ef562e',
+		'#b3dce0',
+		'#f588a3',
+		'#27ac9f',
+		'#14976b',
+		'#2a67af',
+		'#f9d432',
+		'#abcd5e',
+		'#62b6de'
+	];
 
 	onMount(() => {
 		const onScroll = throttle(handleTrigger, 1500, { leading: true, trailing: false });
@@ -76,6 +90,8 @@
 				Math.round(Math.random())
 			]
 		];
+
+		triangleColors = new Array(50).fill(undefined).map(() => COLORS[Math.round(Math.random() * 9)]);
 	};
 
 	let rows = [
@@ -115,11 +131,52 @@
 			Math.round(Math.random())
 		]
 	];
+
+	let triangleColors = new Array(50)
+		.fill(undefined)
+		.map(() => COLORS[Math.round(Math.random() * 9)]);
 </script>
 
-<svg id="scroll-container" class="fixed top-0 left-0 h-full w-full" viewBox="0 0 1000 1000">
-	<rect width="100%" height="100%" fill="#fff" />
+<svg
+	id="scroll-container"
+	class="bg-[#fefbe6] fixed top-0 left-0 h-full w-full"
+	viewBox="0 0 1000 1000"
+>
+	<rect width="100%" height="100%" fill="#fefbe6" />
 	<g stroke-width="0">
+		{#each rows as row, i}
+			{#each row as square, j}
+				<Triangle
+					a={centers[i * 6 + j]}
+					b={centers[(i + 1) * 6 + j]}
+					c={centers[(i + 1) * 6 + (j + 1)]}
+					fill={triangleColors[i * 5 + j]}
+					show={!Boolean(square)}
+				/>
+				<Triangle
+					a={centers[i * 6 + j]}
+					b={centers[i * 6 + (j + 1)]}
+					c={centers[(i + 1) * 6 + (j + 1)]}
+					fill={triangleColors[i * 5 + j + 1]}
+					show={!Boolean(square)}
+				/>
+				<Triangle
+					a={centers[i * 6 + j]}
+					b={centers[i * 6 + (j + 1)]}
+					c={centers[(i + 1) * 6 + j]}
+					fill={triangleColors[i * 5 + j]}
+					show={Boolean(square)}
+				/>
+				<Triangle
+					a={centers[(i + 1) * 6 + j]}
+					b={centers[i * 6 + (j + 1)]}
+					c={centers[(i + 1) * 6 + (j + 1)]}
+					fill={triangleColors[i * 5 + j + 1]}
+					show={Boolean(square)}
+				/>
+			{/each}
+		{/each}
+
 		{#each centers as center, i}
 			<circle id={`circle-${i}`} cx={center[0]} cy={center[1]} r={radius} {fill} {stroke} />
 		{/each}
@@ -128,13 +185,13 @@
 			{#each row as square, j}
 				<Connection
 					center1={centers[i * 6 + j]}
-					center2={centers[i * 6 + j + 7]}
+					center2={centers[(i + 1) * 6 + j + 1]}
 					show={Boolean(square)}
 					arcRadius={2 * radius}
 				/>
 				<Connection
 					center1={centers[i * 6 + j + 1]}
-					center2={centers[i * 6 + j + 6]}
+					center2={centers[(i + 1) * 6 + j]}
 					show={!Boolean(square)}
 					arcRadius={2 * radius}
 				/>
