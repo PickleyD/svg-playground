@@ -29,13 +29,19 @@
 	}
 
 	let edgeCenters: Array<Vector2> = [];
+	let edgeVariation = Math.random() > 0.5 ? 0 : 1;
 	for (let i = 0; i < numCirclesY * 2 - 1; i++) {
 		let y = 230 + i * 45;
 		for (let j = 0; j < numCirclesX * 2 - 1; j++) {
 			if (i !== 0 && i !== numCirclesX * 2 - 1 - 1 && j !== 0 && j !== numCirclesY * 2 - 1 - 1)
 				continue;
-			if (i % 4 == 0 && j % 4 == 0) continue;
-			if (i % 4 == 2 && j % 4 == 2) continue;
+			if (edgeVariation) {
+				if (i % 4 == 0 && j % 4 == 0) continue;
+				if (i % 4 == 2 && j % 4 == 2) continue;
+			} else {
+				if (i % 4 == 0 && j % 4 == 2) continue;
+				if (i % 4 == 2 && j % 4 == 0) continue;
+			}
 			edgeCenters.push([230 + j * 45, y]);
 		}
 	}
@@ -133,6 +139,24 @@
 		smolMaybeCircleVisibilities = new Array(smolMaybeCenters.length)
 			.fill(undefined)
 			.map(() => Math.random() > 0.5);
+
+		edgeCenters = [];
+		edgeVariation = Math.random() > 0.5 ? 0 : 1;
+		for (let i = 0; i < numCirclesY * 2 - 1; i++) {
+			let y = 230 + i * 45;
+			for (let j = 0; j < numCirclesX * 2 - 1; j++) {
+				if (i !== 0 && i !== numCirclesX * 2 - 1 - 1 && j !== 0 && j !== numCirclesY * 2 - 1 - 1)
+					continue;
+				if (edgeVariation) {
+					if (i % 4 == 0 && j % 4 == 0) continue;
+					if (i % 4 == 2 && j % 4 == 2) continue;
+				} else {
+					if (i % 4 == 0 && j % 4 == 2) continue;
+					if (i % 4 == 2 && j % 4 == 0) continue;
+				}
+				edgeCenters.push([230 + j * 45, y]);
+			}
+		}
 	};
 
 	let rows = [
