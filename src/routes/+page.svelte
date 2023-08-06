@@ -12,6 +12,7 @@
 
 	const v = 0.5;
 	const radius = 30;
+	const smolRadius = 15;
 	const center1: Vector2 = [230, 230];
 	const center2: Vector2 = [330, 330];
 	const d = dist(center1, center2);
@@ -24,6 +25,42 @@
 		let y = 230 + i * 90;
 		for (let j = 0; j < numCirclesX; j++) {
 			centers.push([230 + j * 90, y]);
+		}
+	}
+
+	let edgeCenters: Array<Vector2> = [];
+	for (let i = 0; i < numCirclesY * 2 - 1; i++) {
+		let y = 230 + i * 45;
+		for (let j = 0; j < numCirclesX * 2 - 1; j++) {
+			if (i !== 0 && i !== numCirclesX * 2 - 1 - 1 && j !== 0 && j !== numCirclesY * 2 - 1 - 1)
+				continue;
+			if (i % 4 == 0 && j % 4 == 0) continue;
+			if (i % 4 == 2 && j % 4 == 2) continue;
+			edgeCenters.push([230 + j * 45, y]);
+		}
+	}
+
+	let smolCenters: Array<Vector2> = [];
+	for (let i = 0; i < numCirclesY * 2 - 1; i++) {
+		let y = 230 + i * 45;
+		for (let j = 0; j < numCirclesX * 2 - 1; j++) {
+			if (i == 0 || j == 0 || i == numCirclesX * 2 - 1 - 1 || j == numCirclesY * 2 - 1 - 1)
+				continue;
+			if (i % 2 == 1 && j % 2 == 1) continue;
+			if (i % 2 == 0 && j % 2 == 0) continue;
+			smolCenters.push([230 + j * 45, y]);
+		}
+	}
+
+	let smolMaybeCenters: Array<Vector2> = [];
+	for (let i = 0; i < numCirclesY * 2 - 1; i++) {
+		let y = 230 + i * 45;
+		for (let j = 0; j < numCirclesX * 2 - 1; j++) {
+			if (i == 0 || j == 0 || i == numCirclesX * 2 - 1 - 1 || j == numCirclesY * 2 - 1 - 1)
+				continue;
+			if (i % 2 == 1 && j % 2 == 1) continue;
+			if (!(i % 2 == 0 && j % 2 == 0)) continue;
+			smolMaybeCenters.push([230 + j * 45, y]);
 		}
 	}
 
@@ -92,6 +129,10 @@
 		];
 
 		triangleColors = new Array(50).fill(undefined).map(() => COLORS[Math.round(Math.random() * 9)]);
+
+		smolMaybeCircleVisibilities = new Array(smolMaybeCenters.length)
+			.fill(undefined)
+			.map(() => Math.random() > 0.5);
 	};
 
 	let rows = [
@@ -135,6 +176,10 @@
 	let triangleColors = new Array(50)
 		.fill(undefined)
 		.map(() => COLORS[Math.round(Math.random() * 9)]);
+
+	let smolMaybeCircleVisibilities = new Array(smolMaybeCenters.length)
+		.fill(undefined)
+		.map(() => Math.random() > 0.5);
 </script>
 
 <svg
@@ -196,6 +241,36 @@
 					arcRadius={2 * radius}
 				/>
 			{/each}
+		{/each}
+
+		{#each edgeCenters as edgeCenter, i}
+			<circle
+				id={`smol-edge-circle-${i}`}
+				cx={edgeCenter[0]}
+				cy={edgeCenter[1]}
+				r={smolRadius}
+				fill="#fefbe6"
+			/>
+		{/each}
+
+		{#each smolCenters as smolCenter, i}
+			<circle
+				id={`smol-circle-${i}`}
+				cx={smolCenter[0]}
+				cy={smolCenter[1]}
+				r={smolRadius}
+				fill={'#fefbe6'}
+			/>
+		{/each}
+
+		{#each smolMaybeCenters as smolMaybeCenter, i}
+			<circle
+				id={`smol-circle-${i}`}
+				cx={smolMaybeCenter[0]}
+				cy={smolMaybeCenter[1]}
+				r={smolRadius}
+				fill={smolMaybeCircleVisibilities[i] ? '#fefbe6' : 'none'}
+			/>
 		{/each}
 	</g>
 </svg>
