@@ -3,6 +3,7 @@
 	import Connection from '../components/Connection.svelte';
 	import Triangle from '../components/Triangle.svelte';
 	import { throttle } from 'lodash';
+	import { scale } from 'svelte/transition';
 
 	type Vector2 = [x: number, y: number];
 
@@ -66,6 +67,7 @@
 				continue;
 			if (i % 2 == 1 && j % 2 == 1) continue;
 			if (!(i % 2 == 0 && j % 2 == 0)) continue;
+			if (Math.random() > 0.5) continue;
 			smolMaybeCenters.push([230 + j * 45, y]);
 		}
 	}
@@ -136,10 +138,6 @@
 
 		triangleColors = new Array(50).fill(undefined).map(() => COLORS[Math.round(Math.random() * 9)]);
 
-		smolMaybeCircleVisibilities = new Array(smolMaybeCenters.length)
-			.fill(undefined)
-			.map(() => Math.random() > 0.5);
-
 		edgeCenters = [];
 		edgeVariation = Math.random() > 0.5 ? 0 : 1;
 		for (let i = 0; i < numCirclesY * 2 - 1; i++) {
@@ -155,6 +153,19 @@
 					if (i % 4 == 2 && j % 4 == 0) continue;
 				}
 				edgeCenters.push([230 + j * 45, y]);
+			}
+		}
+
+		smolMaybeCenters = [];
+		for (let i = 0; i < numCirclesY * 2 - 1; i++) {
+			let y = 230 + i * 45;
+			for (let j = 0; j < numCirclesX * 2 - 1; j++) {
+				if (i == 0 || j == 0 || i == numCirclesX * 2 - 1 - 1 || j == numCirclesY * 2 - 1 - 1)
+					continue;
+				if (i % 2 == 1 && j % 2 == 1) continue;
+				if (!(i % 2 == 0 && j % 2 == 0)) continue;
+				if (Math.random() > 0.5) continue;
+				smolMaybeCenters.push([230 + j * 45, y]);
 			}
 		}
 	};
@@ -200,10 +211,6 @@
 	let triangleColors = new Array(50)
 		.fill(undefined)
 		.map(() => COLORS[Math.round(Math.random() * 9)]);
-
-	let smolMaybeCircleVisibilities = new Array(smolMaybeCenters.length)
-		.fill(undefined)
-		.map(() => Math.random() > 0.5);
 </script>
 
 <svg
@@ -267,33 +274,39 @@
 			{/each}
 		{/each}
 
-		{#each edgeCenters as edgeCenter, i}
+		{#each edgeCenters as edgeCenter, i (`${edgeCenter[0]},${edgeCenter[1]}`)}
 			<circle
 				id={`smol-edge-circle-${i}`}
 				cx={edgeCenter[0]}
 				cy={edgeCenter[1]}
 				r={smolRadius}
 				fill="#fefbe6"
+				transition:scale={{ duration: 400, opacity: 1 }}
+				class='origin-center'
 			/>
 		{/each}
 
-		{#each smolCenters as smolCenter, i}
+		{#each smolCenters as smolCenter, i (`${smolCenter[0]},${smolCenter[1]}`)}
 			<circle
 				id={`smol-circle-${i}`}
 				cx={smolCenter[0]}
 				cy={smolCenter[1]}
 				r={smolRadius}
 				fill={'#fefbe6'}
+				transition:scale={{ duration: 400, opacity: 1 }}
+				class='origin-center'
 			/>
 		{/each}
 
-		{#each smolMaybeCenters as smolMaybeCenter, i}
+		{#each smolMaybeCenters as smolMaybeCenter, i (`${smolMaybeCenter[0]},${smolMaybeCenter[1]}`)}
 			<circle
 				id={`smol-circle-${i}`}
 				cx={smolMaybeCenter[0]}
 				cy={smolMaybeCenter[1]}
 				r={smolRadius}
-				fill={smolMaybeCircleVisibilities[i] ? '#fefbe6' : 'none'}
+				fill={'#fefbe6'}
+				transition:scale={{ duration: 400, opacity: 1 }}
+				class='origin-center'
 			/>
 		{/each}
 	</g>
