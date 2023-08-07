@@ -231,7 +231,7 @@
 
 	$: escaped = d > radius1;
 
-	$: newPath = [
+	$: newPath = hxArrAnim.length > 0 && hyArrAnim.length > 0 ? [
 		'M',
 		p1Anim,
 		'C',
@@ -261,27 +261,9 @@
 		0,
 		p1Anim,
 		'z'
-	].join(' ');
+	].join(' ') : '';
 
     let path: SVGPathElement;
 </script>
 
 <path bind:this={path} d={newPath} {fill} {stroke} class={cn('', className)} />
-<!-- <path d={arc1} fill="orange" stroke-width="1" stroke="orange" />
-<path d={arc2} fill="purple" stroke-width="1" stroke="purple" />
-<path d={arc3} fill="green" stroke-width="1" stroke="green" />
-<path d={arc4} fill="red" stroke-width="1" stroke="red" />
-
-<circle cx={p1Anim[0]} cy={p1Anim[1]} r={1} fill="cyan" stroke="cyan" />
-<circle cx={p2Anim[0]} cy={p2Anim[1]} r={1} fill="cyan" stroke="cyan" />
-<circle cx={p3Anim[0]} cy={p3Anim[1]} r={1} fill="cyan" stroke="cyan" />
-<circle cx={p4Anim[0]} cy={p4Anim[1]} r={1} fill="cyan" stroke="cyan" /> -->
-
-<!-- <circle cx={h1[0]} cy={h1[1]} r={1} fill="blue" stroke="blue" /> -->
-<!-- <circle cx={shrinkH1[0]} cy={shrinkH1[1]} r={1} fill='blue' stroke='blue' /> -->
-<!-- <circle cx={260} cy={230} r={1} fill="blue" stroke="blue" />
-<circle cx={264.89170033218403} cy={224.15776173636607} r={1} fill="blue" stroke="blue" />
-<circle cx={271.5685424949238} cy={230.85786437626905} r={1} fill="blue" stroke="blue" />
-<circle cx={277.06787787871883} cy={242.97561263928588} r={1} fill="blue" stroke="blue" />
-<circle cx={280} cy={260} r={1} fill="blue" stroke="blue" />
-<circle cx={hxArrAnim[0]} cy={hyArrAnim[0]} r={1} fill="purple" stroke="purple" /> -->
