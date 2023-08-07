@@ -3,7 +3,7 @@
 	import Connection from '../components/Connection.svelte';
 	import Triangle from '../components/Triangle.svelte';
 	import { throttle } from 'lodash';
-	import { scale } from 'svelte/transition';
+	import { scale, fade } from 'svelte/transition';
 
 	type Vector2 = [x: number, y: number];
 
@@ -222,34 +222,33 @@
 	<g stroke-width="0">
 		{#each rows as row, i}
 			{#each row as square, j}
-				<Triangle
-					a={centers[i * 6 + j]}
-					b={centers[(i + 1) * 6 + j]}
-					c={centers[(i + 1) * 6 + (j + 1)]}
-					fill={triangleColors[i * 5 + j]}
-					show={!Boolean(square)}
-				/>
-				<Triangle
-					a={centers[i * 6 + j]}
-					b={centers[i * 6 + (j + 1)]}
-					c={centers[(i + 1) * 6 + (j + 1)]}
-					fill={triangleColors[i * 5 + j + 1]}
-					show={!Boolean(square)}
-				/>
-				<Triangle
-					a={centers[i * 6 + j]}
-					b={centers[i * 6 + (j + 1)]}
-					c={centers[(i + 1) * 6 + j]}
-					fill={triangleColors[i * 5 + j]}
-					show={Boolean(square)}
-				/>
-				<Triangle
-					a={centers[(i + 1) * 6 + j]}
-					b={centers[i * 6 + (j + 1)]}
-					c={centers[(i + 1) * 6 + (j + 1)]}
-					fill={triangleColors[i * 5 + j + 1]}
-					show={Boolean(square)}
-				/>
+				{#if Boolean(square)}
+					<Triangle
+						a={centers[i * 6 + j]}
+						b={centers[i * 6 + (j + 1)]}
+						c={centers[(i + 1) * 6 + j]}
+						fill={triangleColors[i * 5 + j]}
+					/>
+					<Triangle
+						a={centers[(i + 1) * 6 + j]}
+						b={centers[i * 6 + (j + 1)]}
+						c={centers[(i + 1) * 6 + (j + 1)]}
+						fill={triangleColors[i * 5 + j + 1]}
+					/>
+				{:else}
+					<Triangle
+						a={centers[i * 6 + j]}
+						b={centers[(i + 1) * 6 + j]}
+						c={centers[(i + 1) * 6 + (j + 1)]}
+						fill={triangleColors[i * 5 + j]}
+					/>
+					<Triangle
+						a={centers[i * 6 + j]}
+						b={centers[i * 6 + (j + 1)]}
+						c={centers[(i + 1) * 6 + (j + 1)]}
+						fill={triangleColors[i * 5 + j + 1]}
+					/>
+				{/if}
 			{/each}
 		{/each}
 
@@ -282,7 +281,7 @@
 				r={smolRadius}
 				fill="#fefbe6"
 				transition:scale={{ duration: 400, opacity: 1 }}
-				class='origin-center'
+				class="origin-center"
 			/>
 		{/each}
 
@@ -294,7 +293,7 @@
 				r={smolRadius}
 				fill={'#fefbe6'}
 				transition:scale={{ duration: 400, opacity: 1 }}
-				class='origin-center'
+				class="origin-center"
 			/>
 		{/each}
 
@@ -306,7 +305,7 @@
 				r={smolRadius}
 				fill={'#fefbe6'}
 				transition:scale={{ duration: 400, opacity: 1 }}
-				class='origin-center'
+				class="origin-center"
 			/>
 		{/each}
 	</g>
