@@ -7,6 +7,9 @@ dependencies:
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
+  svelte-gestures:
+    specifier: ^1.5.2
+    version: 1.5.2
 
 devDependencies:
   '@sveltejs/adapter-auto':
@@ -1998,6 +2001,10 @@ packages:
       postcss-scss: 4.0.6(postcss@8.4.26)
       svelte: 4.0.5
     dev: true
+
+  /svelte-gestures@1.5.2:
+    resolution: {integrity: sha512-bXGFqpNAAYCM4XsxjaHMAoPQC3IRjrgGS+Sm/pE1ZftYu9gGRWvDF8g6cwl2b751R2kN1SwNEd6XV7zVh9mcew==}
+    dev: false
 
   /svelte-hmr@0.15.2(svelte@4.0.5):
     resolution: {integrity: sha512-q/bAruCvFLwvNbeE1x3n37TYFb3mTBJ6TrCq6p2CoFbSTNhDE9oAtEfpy+wmc9So8AG0Tja+X0/mJzX9tSfvIg==}

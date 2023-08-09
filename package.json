@@ -36,6 +36,7 @@
 	"type": "module",
 	"dependencies": {
 		"gsap": "^3.12.2",
-		"lodash": "^4.17.21"
+		"lodash": "^4.17.21",
+		"svelte-gestures": "^1.5.2"
 	}
 }

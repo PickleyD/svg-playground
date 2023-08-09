@@ -4,6 +4,7 @@
 	import Triangle from '../components/Triangle.svelte';
 	import { throttle } from 'lodash';
 	import { scale, fade } from 'svelte/transition';
+	import { swipe } from 'svelte-gestures';
 
 	type Vector2 = [x: number, y: number];
 
@@ -211,7 +212,7 @@
 		.map(() => COLORS[Math.round(Math.random() * 9)]);
 </script>
 
-<div class="fixed top-0 left-0 flex items-center justify-center bg-[#fefbe6] w-screen h-screen">
+<div class="fixed top-0 left-0 flex items-center justify-center bg-[#fefbe6] w-screen h-screen" use:swipe={{}} on:swipe={handleTrigger}>
 	<svg id="scroll-container" class="bg-[#fefbe6] h-full w-full max-w-[600px]" viewBox="0 0 600 600">
 		<g stroke-width="0">
 			{#each rows as row, i}
